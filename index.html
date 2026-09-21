@@ -163,6 +163,12 @@ select[data-k]{min-width:104px}
 }
 .hidden{display:none!important}
 
+.planner-nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.planner-btn{display:inline-flex;align-items:center;justify-content:center;min-width:112px;padding:10px 18px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700;border:1px solid transparent;transition:.15s ease}
+.planner-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.pak-btn{background:#f4e9fb;color:#5d3674;border-color:#dfc8ed}.matthew-btn{background:#e7f0fb;color:#315d85;border-color:#c9dcf1}.arpit-btn{background:#e5f4eb;color:#315f45;border-color:#c7e5d3}
+
+
 /* Column sizing */
 th:nth-child(2),td:nth-child(2){width:105px;min-width:105px;max-width:105px}
 th:nth-child(3),td:nth-child(3){width:360px;min-width:360px}
@@ -222,17 +228,15 @@ th:nth-child(4) select,td:nth-child(4) select{max-width:115px}
 <header class="masthead">
   <div class="masthead-row">
     <div>
-      <div class="masthead-id">EVENT PLANNER · TOKEN2049 SINGAPORE 2026</div>
+      <div class="masthead-id">HOME PAGE · TOKEN2049 SINGAPORE 2026</div>
       <h1>SETTLD Event Manager</h1>
       <div class="masthead-sub">Baseline 18 Sep 2026 · shared edits save automatically</div>
     </div>
-    <div class="ticker">
-      <div class="cell"><b id="total">0</b><span>Total</span></div>
-      <div class="cell"><b id="approved">0</b><span>Approved Events</span></div>
-      <div class="cell"><b id="pending">0</b><span>No Approval</span></div>
-      <div class="cell"><b id="go">0</b><span>Go</span></div>
-      <div class="cell"><b id="shown">0</b><span>Shown</span></div>
-    </div>
+    <div class="planner-nav">
+  <a class="planner-btn pak-btn" href="pak.html">Pak</a>
+  <a class="planner-btn matthew-btn" href="matthew.html">Matthew</a>
+  <a class="planner-btn arpit-btn" href="arpit.html">Arpit</a>
+</div>
   </div>
 </header>
 
@@ -419,11 +423,11 @@ function render(){
   }));
   body.appendChild(tr);
  });
- document.querySelector('#shown').textContent=body.children.length;
+ 
  updateStats();
 }
 
-function updateStats(){const a=Object.values(state);document.querySelector('#total').textContent=a.length;document.querySelector('#approved').textContent=a.filter(x=>selectedPeople(x).length>0).length;document.querySelector('#pending').textContent=a.filter(x=>selectedPeople(x).length===0).length;document.querySelector('#go').textContent=a.filter(x=>x.plan==='GO').length;}
+function updateStats(){const a=Object.values(state);document.querySelector('#go').textContent=a.filter(x=>x.plan==='GO').length;}
 
 function exportCSV(){const cols=['id','date','start','end','event','category','price','application','approval','fit','priority','venue','crowd','plan','notes','url'];const lines=[cols.join(',')].concat(Object.values(state).map(e=>cols.map(k=>'"'+String(e[k]??'').replace(/"/g,'""')+'"').join(',')));const b=new Blob([lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Matthew_TOKEN2049_managed_events.csv';a.click();URL.revokeObjectURL(a.href)}
 
