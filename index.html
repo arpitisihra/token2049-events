@@ -355,7 +355,6 @@ async function saveEvent(e){
     console.error('Supabase save failed:',error);
     alert('This change could not be saved. Please refresh and try again.');
   }
-  updateStats();
 }
 
 async function loadSharedEdits(){
@@ -424,10 +423,8 @@ function render(){
   body.appendChild(tr);
  });
  
- updateStats();
 }
 
-function updateStats(){const a=Object.values(state);document.querySelector('#go').textContent=a.filter(x=>x.plan==='GO').length;}
 
 function exportCSV(){const cols=['id','date','start','end','event','category','price','application','approval','fit','priority','venue','crowd','plan','notes','url'];const lines=[cols.join(',')].concat(Object.values(state).map(e=>cols.map(k=>'"'+String(e[k]??'').replace(/"/g,'""')+'"').join(',')));const b=new Blob([lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Matthew_TOKEN2049_managed_events.csv';a.click();URL.revokeObjectURL(a.href)}
 
