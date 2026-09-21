@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Matthew — TOKEN2049 Event Manager</title>
+<title>SETTLD Event Manager — TOKEN2049 Singapore 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -99,7 +99,7 @@ button:not(.primary):hover{background:#f4f6f4}
   background:var(--panel); border:1px solid var(--line); border-radius:10px;
   overflow:auto; box-shadow:0 1px 3px rgba(15,20,15,.05);
 }
-table{border-collapse:separate; border-spacing:0; width:100%; min-width:1260px}
+table{border-collapse:separate; border-spacing:0; width:100%; min-width:1340px}
 th{
   position:sticky; top:0; background:#f6f8f6; text-align:left;
   padding:9px 10px; border-bottom:1px solid var(--line-strong);
@@ -163,6 +163,34 @@ select[data-k]{min-width:104px}
 }
 .hidden{display:none!important}
 
+/* Column sizing */
+th:nth-child(2),td:nth-child(2){width:105px;min-width:105px;max-width:105px}
+th:nth-child(3),td:nth-child(3){width:360px;min-width:360px}
+th:nth-child(4),td:nth-child(4){width:120px;min-width:120px;max-width:120px}
+th:nth-child(4) select,td:nth-child(4) select{max-width:115px}
+
+
+.crowd-control{min-width:210px}
+.crowd-add{width:100%;min-width:100px;margin-bottom:5px}
+.crowd-chips{display:flex;flex-wrap:wrap;gap:4px}
+.crowd-chip{border:1px solid transparent;border-radius:999px;padding:4px 8px;font-size:10.5px;font-weight:650;cursor:pointer;line-height:1.1}
+.tag-vc{background:#e9e3fb;color:#5e45a1;border-color:#d7ccf5}
+.tag-partners{background:#e1f2f7;color:#356d7d;border-color:#c8e6ee}
+.tag-legal{background:#f1ece4;color:#725e43;border-color:#e2d8c8}
+.tag-web3{background:#e5ebfb;color:#3f5f9e;border-color:#cfdbf5}
+.tag-ai{background:#f5e3f0;color:#8a4674;border-color:#ebcade}
+.tag-web3-marketing{background:#fce9df;color:#985d3e;border-color:#f4d2bf}
+.tag-stablecoins{background:#e0f3ea;color:#39715a;border-color:#c5e7d6}
+.tag-funds{background:#e6eef2;color:#476675;border-color:#cfdee5}
+.tag-rwa{background:#eee5f6;color:#71528c;border-color:#dfcfec}
+.tag-party{background:#fbe4eb;color:#984e67;border-color:#f3cad7}
+.tag-token-listing{background:#f7edcf;color:#866b28;border-color:#ecdca8}
+.tag-dao{background:#e3eff9;color:#416f94;border-color:#cbdff0}
+.tag-staking{background:#e3f3df;color:#4e7745;border-color:#cee8c8}
+.tag-other{background:#eeeeee;color:#626262;border-color:#dddddd}
+.priority-select{min-width:205px}
+
+
 .approval-multi{display:flex;gap:6px;align-items:center;white-space:nowrap}
 .person-chip{
   border:1px solid transparent;
@@ -194,8 +222,8 @@ select[data-k]{min-width:104px}
 <header class="masthead">
   <div class="masthead-row">
     <div>
-      <div class="masthead-id">EVENT MANIFEST · TOKEN2049 SINGAPORE 2026</div>
-      <h1>Matthew — Event Manager</h1>
+      <div class="masthead-id">EVENT PLANNER · TOKEN2049 SINGAPORE 2026</div>
+      <h1>SETTLD Event Manager</h1>
       <div class="masthead-sub">Baseline 18 Sep 2026 · shared edits save automatically</div>
     </div>
     <div class="ticker">
@@ -216,10 +244,6 @@ select[data-k]{min-width:104px}
     <option value="">All approvals</option>
     <option>Pak</option><option>Matthew</option><option>Arpit</option>
   </select>
-  <select id="fFit">
-    <option value="">All fit scores</option>
-    <option value="5">5/5</option><option value="4">4/5</option><option value="3">3/5</option><option value="2">2/5</option><option value="1">1/5</option>
-  </select>
   <select id="fPlan">
     <option value="">All plans</option><option>GO</option><option>FORGONE</option><option>Unplanned</option>
   </select>
@@ -239,7 +263,7 @@ select[data-k]{min-width:104px}
       <thead>
         <tr>
           <th>Date</th><th>Time (SGT)</th><th>Event</th><th>Category</th><th>Price</th>
-          <th>Approval</th><th>Fit</th><th>Priority</th>
+          <th>Approval</th><th>Fit &amp; Priority</th>
           <th>Crowd</th><th>Plan</th><th>Notes</th><th>Link</th>
         </tr>
       </thead>
@@ -276,6 +300,22 @@ function displayDate(dstr){
   return `${ordinal(d.getDate())} ${months[d.getMonth()]}`;
 }
 const PEOPLE=['Pak','Matthew','Arpit'];
+const CROWD_TAGS=['VC','Partners','Legal','Web3','AI','Web3 Marketing','Stablecoins','Funds','RWA','Party','Token Listing','DAO','Staking','Other'];
+function selectedCrowd(e){
+  return String(e.crowd||'').split(',').map(x=>x.trim()).filter(x=>CROWD_TAGS.includes(x));
+}
+function crowdControl(e){
+  const selected=selectedCrowd(e);
+  return `<div class="crowd-control">
+    <select class="crowd-add" data-crowd-add>
+      <option value="">+ Add</option>
+      ${CROWD_TAGS.filter(t=>!selected.includes(t)).map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}
+    </select>
+    <div class="crowd-chips">${selected.map(t=>`<button type="button" class="crowd-chip tag-${slug(t)}" data-crowd-remove="${esc(t)}" title="Click to remove">${esc(t)} ×</button>`).join('')}</div>
+  </div>`;
+}
+function slug(v){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+
 function selectedPeople(e){
   const v=String(e.approval||'');
   if(['Pending','Approved','Rejected','Waitlist',''].includes(v)){
@@ -341,15 +381,15 @@ async function seedMissingEvents(){
 }
 
 function render(){
- const q=document.querySelector('#q').value.toLowerCase(), fd=document.querySelector('#fDate').value, fc=document.querySelector('#fCat').value, fa=document.querySelector('#fApproval').value, ff=document.querySelector('#fFit').value, fp=document.querySelector('#fPlan').value;
+ const q=document.querySelector('#q').value.toLowerCase(), fd=document.querySelector('#fDate').value, fc=document.querySelector('#fCat').value, fa=document.querySelector('#fApproval').value, fp=document.querySelector('#fPlan').value;
  const body=document.querySelector('#body'); body.innerHTML='';
- Object.values(state).filter(e=>(!q||[e.event,e.category,e.notes].join(' ').toLowerCase().includes(q))&&(!fd||e.date===fd)&&(!fc||e.category===fc)&&(!fa||selectedPeople(e).includes(fa))&&(!ff||e.fit===ff)&&(!fp||e.plan===fp)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start)||a.event.localeCompare(b.event)).forEach(e=>{
+ Object.values(state).filter(e=>(!q||[e.event,e.category,e.notes].join(' ').toLowerCase().includes(q))&&(!fd||e.date===fd)&&(!fc||e.category===fc)&&(!fa||selectedPeople(e).includes(fa))&&(!fp||e.plan===fp)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start)||a.event.localeCompare(b.event)).forEach(e=>{
   const tr=document.createElement('tr'); tr.className='';
-  tr.innerHTML=`<td class="date-cell">${displayDate(e.date)}<span class="dow">${dowOf(e.date)}</span></td><td class="time-cell">${esc(e.start)}–${esc(e.end)} <span style="color:var(--muted);font-size:10px">SGT</span></td><td class="event">${e.url?`<a href="${esc(e.url)}" target="_blank">${esc(e.event)}</a>`:esc(e.event)}</td><td><span class="cat-tag">${esc(e.category)}</span></td><td class="price-cell">${esc(e.price)}</td>
+  tr.innerHTML=`<td class="date-cell">${displayDate(e.date)}<span class="dow">${dowOf(e.date)}</span></td><td class="time-cell">${esc(e.start)}–${esc(e.end)}</td><td class="event">${e.url?`<a href="${esc(e.url)}" target="_blank">${esc(e.event)}</a>`:esc(e.event)}</td><td><span class="cat-tag">${esc(e.category)}</span></td><td class="price-cell">${esc(e.price)}</td>
   <td>${approvalChecks(e)}</td>
-  <td><select data-k="fit"><option value="">—</option>${['1','2','3','4','5'].map(x=>`<option value="${x}" ${e.fit===x?'selected':''}>${x}/5</option>`).join('')}</select></td>
-  <td><select data-k="priority"><option value="">—</option>${opts(['Must Go','Strong','Maybe','Skip'],e.priority)}</select></td>
-  <td><input class="crowd" data-k="crowd" value="${esc(e.crowd)}" placeholder="—"></td>
+  
+  <td><select class="priority-select" data-k="priority"><option value="">—</option>${opts(['5 - Must attend','4 - Right people & opportunity','3 - Good fit therefore prospective','2 - Last resort','1 - Don’t bother'],e.priority)}</select></td>
+  <td>${crowdControl(e)}</td>
   <td><select data-k="plan">${opts(['Unplanned','GO','FORGONE'],e.plan)}</select></td><td><input class="notes" data-k="notes" value="${esc(e.notes)}" placeholder="Notes / rationale"></td><td>${e.url?`<a class="linkbtn" href="${esc(e.url)}" target="_blank">Open ↗</a>`:'<span class="empty">—</span>'}</td>`;
   tr.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',async()=>{
     e[el.dataset.k]=el.value;
@@ -360,6 +400,20 @@ function render(){
     const name=el.dataset.person;
     const names=selectedPeople(e);
     e.approval=(names.includes(name)?names.filter(x=>x!==name):[...names,name]).join(',');
+    render();
+    await saveEvent(e);
+  }));
+  const crowdAdd=tr.querySelector('[data-crowd-add]');
+  if(crowdAdd) crowdAdd.addEventListener('change',async()=>{
+    if(!crowdAdd.value) return;
+    const tags=selectedCrowd(e);
+    if(!tags.includes(crowdAdd.value)) tags.push(crowdAdd.value);
+    e.crowd=tags.join(',');
+    render();
+    await saveEvent(e);
+  });
+  tr.querySelectorAll('[data-crowd-remove]').forEach(el=>el.addEventListener('click',async()=>{
+    e.crowd=selectedCrowd(e).filter(x=>x!==el.dataset.crowdRemove).join(',');
     render();
     await saveEvent(e);
   }));
@@ -385,7 +439,7 @@ async function resetAll(){
 window.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('#fDate').innerHTML='<option value="">All dates</option>'+dates.map(d=>`<option>${d}</option>`).join('');
   document.querySelector('#fCat').innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
-  ['q','fDate','fCat','fApproval','fFit','fPlan'].forEach(id=>document.querySelector('#'+id).addEventListener(id==='q'?'input':'change',render));
+  ['q','fDate','fCat','fApproval','fPlan'].forEach(id=>document.querySelector('#'+id).addEventListener(id==='q'?'input':'change',render));
   await loadSharedEdits();
   await seedMissingEvents();
   render();
