@@ -280,6 +280,7 @@ th{position:static!important;top:auto!important}
     <option value="">All plans</option><option>GO</option><option>FORGONE</option><option>Unplanned</option>
   </select>
   <div class="toolbar-divider"></div>
+  <button class="primary" id="addEventBtn" type="button">+ Add Event</button>
   <button class="primary" onclick="exportCSV()">Export CSV</button>
   <button onclick="resetAll()">Reset</button>
 </div>
@@ -355,11 +356,14 @@ function plannedOptions(e){
  if(!vals.includes(e.end)) vals.push(e.end);
  return `<option value="">—</option>`+vals.map(x=>`<option value="${x}" ${e.planned_time===x?'selected':''}>${x}</option>`).join('');
 }
-function dbRow(e){return {id:e.id,application:e.application,approval:e.approval,fit:e.fit||'',priority:e.priority||'',venue:e.venue||'',crowd:e.crowd||'',plan:e.plan,notes:e.notes||'',planned_time:e.planned_time||'',from_previous_stop:e.from_previous_stop||'',map_link:e.map_link||'',naver_map_link:e.naver_map_link||'',why_forgone:e.why_forgone||''}}
+function dbRow(e){return {id:e.id,application:e.application,approval:e.approval,fit:e.fit||'',priority:e.priority||'',venue:e.venue||'',crowd:e.crowd||'',plan:e.plan,notes:e.notes||'',planned_time:e.planned_time||'',from_previous_stop:e.from_previous_stop||'',map_link:e.map_link||'',naver_map_link:e.naver_map_link||'',why_forgone:e.why_forgone||'',is_manual:!!e.is_manual,event_date:e.date||'',start_time:e.start||'',end_time:e.end||'',event_name:e.event||'',setting:e.category||'',price:e.price||'',event_url:e.url||''}}
 async function saveEvent(e){const {error}=await db.from('event_edits').upsert(dbRow(e),{onConflict:'id'});if(error){console.error(error);alert('Could not save: '+(error.message||'Unknown Supabase error'))}}
 async function loadSharedEdits(){
  const {data,error}=await db.from('event_edits').select('*');if(error){console.error(error);alert('Could not load shared edits from Supabase.');return}
- (data||[]).forEach(r=>{if(state[r.id]) ['application','approval','fit','priority','venue','crowd','plan','notes','planned_time','from_previous_stop','map_link','naver_map_link','why_forgone'].forEach(k=>{if(r[k]!=null)state[r.id][k]=String(r[k])})})
+ (data||[]).forEach(r=>{
+  if(state[r.id]) ['application','approval','fit','priority','venue','crowd','plan','notes','planned_time','from_previous_stop','map_link','naver_map_link','why_forgone'].forEach(k=>{if(r[k]!=null)state[r.id][k]=String(r[k])});
+  else if(r.is_manual) state[r.id]={id:r.id,date:r.event_date||'',start:r.start_time||'',end:r.end_time||'',event:r.event_name||'',category:r.setting||'',price:r.price||'',url:r.event_url||'',application:r.application||'Applied',approval:r.approval||'',fit:r.fit||'',priority:r.priority||'',venue:r.venue||'',crowd:r.crowd||'',plan:r.plan||'Unplanned',notes:r.notes||'',planned_time:r.planned_time||'',from_previous_stop:r.from_previous_stop||'',map_link:r.map_link||'',naver_map_link:r.naver_map_link||'',why_forgone:r.why_forgone||'',is_manual:true};
+ })
 }
 async function seedMissingEvents(){
  const {data,error}=await db.from('event_edits').select('id');if(error)return;
@@ -372,10 +376,14 @@ function render(){
  Object.values(state).filter(e=>(!q||[e.event,e.category,e.notes,e.crowd,e.from_previous_stop].join(' ').toLowerCase().includes(q))&&(!fd||e.date===fd)&&(!fc||e.category===fc)&&(!fa||selectedPeople(e).includes(fa))&&(!fp||e.plan===fp))
  .sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start)||a.event.localeCompare(b.event)).forEach(e=>{
   const tr=document.createElement('tr');
-  tr.innerHTML=`<td class="date-cell">${displayDate(e.date)}<span class="dow">${dowOf(e.date)}</span></td>
+  const baseCells=e.is_manual ? `<td class="date-cell"><span title="Required" style="color:#a33;font-weight:800">*</span> <input class="inline-text" type="date" data-base-k="date" value="${esc(e.date)}"></td>
+  <td class="time-cell"><input class="inline-text" type="time" data-base-k="start" value="${esc(e.start)}"><input class="inline-text" type="time" data-base-k="end" value="${esc(e.end)}" style="margin-top:5px"></td>
+  <td class="event"><input class="inline-text" data-base-k="event" value="${esc(e.event)}" placeholder="Event name *"><input class="inline-text" data-base-k="url" value="${esc(e.url)}" placeholder="Event / Luma link" style="margin-top:5px"></td>
+  <td><input class="inline-text" data-base-k="category" value="${esc(e.category)}" placeholder="Setting"></td><td class="price-cell"><input class="inline-text" data-base-k="price" value="${esc(e.price)}" placeholder="Price"></td>` : `<td class="date-cell">${displayDate(e.date)}<span class="dow">${dowOf(e.date)}</span></td>
   <td class="time-cell">${esc(e.start)}–${esc(e.end)}</td>
   <td class="event">${e.url?`<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.event)}</a>`:esc(e.event)}</td>
-  <td><span class="cat-tag">${esc(e.category)}</span></td><td class="price-cell">${esc(e.price)}</td>
+  <td><span class="cat-tag">${esc(e.category)}</span></td><td class="price-cell">${esc(e.price)}</td>`;
+  tr.innerHTML=`${baseCells}
   <td>${approvalChecks(e)}</td>
   <td><select data-k="priority"><option value="">—</option>${opts(['5 - Must go','4 - Very beneficial','3 - Generally good','2 - If there is time','1 - Avoid'],e.priority)}</select></td>
   <td>${chipControl(e,'crowd',TOPIC_TAGS,'Topic Fit')}</td>
@@ -386,6 +394,7 @@ function render(){
   <td><input class="map-input" data-k="map_link" value="${esc(e.map_link)}" placeholder="Google Maps link"></td>
   <td><input class="map-input" data-k="naver_map_link" value="${esc(e.naver_map_link)}" placeholder="Naver Map link"></td>
   <td><input class="notes" data-k="notes" value="${esc(e.notes)}" placeholder="Notes / rationale"></td>`;
+  tr.querySelectorAll('[data-base-k]').forEach(el=>{const save=async()=>{e[el.dataset.baseK]=el.value;await saveEvent(e)};el.addEventListener('change',save);el.addEventListener('blur',save)});
   tr.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',async()=>{e[el.dataset.k]=el.value;await saveEvent(e)}));
   tr.querySelectorAll('input[data-k]').forEach(el=>el.addEventListener('blur',async()=>{e[el.dataset.k]=el.value;await saveEvent(e)}));
   tr.querySelectorAll('[data-person]').forEach(el=>el.addEventListener('click',async()=>{const n=el.dataset.person,a=selectedPeople(e);e.approval=(a.includes(n)?a.filter(x=>x!==n):[...a,n]).join(',');render();await saveEvent(e)}));
@@ -394,10 +403,36 @@ function render(){
   body.appendChild(tr);
  });
 }
+async function addBlankEvent(){
+ // Allow only one unfinished manually-added event at a time.
+ const unfinished=Object.values(state).find(e=>e.is_manual && (
+   !String(e.date||'').trim() ||
+   !String(e.start||'').trim() ||
+   !String(e.event||'').trim()
+ ));
+ if(unfinished){
+   document.getElementById('q').value='';
+   document.getElementById('date').value='';
+   document.getElementById('approvalFilter').value='';
+   document.getElementById('planFilter').value='';
+   render();
+   const row=document.querySelector(`tr[data-id="${unfinished.id}"]`);
+   if(row) row.scrollIntoView({behavior:'smooth',block:'center'});
+   alert('Complete the mandatory fields (*) — Event Name, Date and Start Time — before adding another event.');
+   return;
+ }
+ const id='manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+ const e={id,date:'',start:'',end:'',event:'',category:'',price:'',url:'',application:'Applied',approval:'',fit:'',priority:'',venue:'',crowd:'',plan:'Unplanned',notes:'',planned_time:'',from_previous_stop:'',map_link:'',naver_map_link:'',why_forgone:'',is_manual:true};
+ state[id]=e;
+ const {error}=await db.from('event_edits').upsert(dbRow(e),{onConflict:'id'});
+ if(error){delete state[id];alert('Could not create event: '+(error.message||'Unknown Supabase error'));return}
+ q.value='';fDate.value='';fCat.value='';fApproval.value='';fPlan.value='';render();
+}
 window.addEventListener('DOMContentLoaded',async()=>{
  fDate.innerHTML='<option value="">All dates</option>'+dates.map(d=>`<option value="${d}">${d}</option>`).join('');
  fCat.innerHTML='<option value="">All settings</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
  ['q','fDate','fCat','fApproval','fPlan'].forEach(id=>document.querySelector('#'+id).addEventListener(id==='q'?'input':'change',render));
+ document.querySelector('#addEventBtn').addEventListener('click',addBlankEvent);
  await loadSharedEdits();await seedMissingEvents();render();
 });
 </script>
