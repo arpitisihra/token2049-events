@@ -275,7 +275,7 @@ th:nth-child(4) select,td:nth-child(4) select{max-width:115px}
         <tr>
           <th>Date</th><th>Time (SGT)</th><th>Event</th><th>Setting</th><th>Price</th>
           <th>Approval</th><th>Fit &amp; Priority Score</th>
-          <th>Topic Fit</th><th>Plan</th><th>Why Forgone</th><th>Planned Time</th><th>From Previous Stop</th><th>Map</th><th>Notes</th>
+          <th>Topic Fit</th><th>Plan</th><th>Why Forgone</th><th>Planned Time</th><th>From Previous Stop</th><th>Google Map</th><th>Naver Map</th><th>Notes</th>
         </tr>
       </thead>
       <tbody id="body"></tbody>
@@ -295,7 +295,7 @@ const TOPIC_TAGS=['DeFi','infrastructure','stablecoins','payments','liquidity','
 const FORGONE_REASONS=['conflict','geography','lower relevance','weaker crowd','weaker format','airport timing','a stronger overlapping event'];
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const state={};
-BASE.forEach(e=>state[e.id]={...e,application:'Applied',approval:e.approval,fit:'',priority:'',venue:'',crowd:'',plan:'Unplanned',notes:'',planned_time:'',from_previous_stop:'',map_link:'',why_forgone:''});
+BASE.forEach(e=>state[e.id]={...e,application:'Applied',approval:e.approval,fit:'',priority:'',venue:'',crowd:'',plan:'Unplanned',notes:'',planned_time:'',from_previous_stop:'',map_link:'',naver_map_link:'',why_forgone:''});
 const cats=[...new Set(BASE.map(x=>x.category))].sort(), dates=[...new Set(BASE.map(x=>x.date))].sort();
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -328,11 +328,11 @@ function plannedOptions(e){
  if(!vals.includes(e.end)) vals.push(e.end);
  return `<option value="">—</option>`+vals.map(x=>`<option value="${x}" ${e.planned_time===x?'selected':''}>${x}</option>`).join('');
 }
-function dbRow(e){return {id:e.id,application:e.application,approval:e.approval,fit:e.fit||'',priority:e.priority||'',venue:e.venue||'',crowd:e.crowd||'',plan:e.plan,notes:e.notes||'',planned_time:e.planned_time||'',from_previous_stop:e.from_previous_stop||'',map_link:e.map_link||'',why_forgone:e.why_forgone||''}}
-async function saveEvent(e){const {error}=await db.from('event_edits').upsert(dbRow(e),{onConflict:'id'});if(error){console.error(error);alert('This change could not be saved. Please refresh and try again.')}}
+function dbRow(e){return {id:e.id,application:e.application,approval:e.approval,fit:e.fit||'',priority:e.priority||'',venue:e.venue||'',crowd:e.crowd||'',plan:e.plan,notes:e.notes||'',planned_time:e.planned_time||'',from_previous_stop:e.from_previous_stop||'',map_link:e.map_link||'',naver_map_link:e.naver_map_link||'',why_forgone:e.why_forgone||''}}
+async function saveEvent(e){const {error}=await db.from('event_edits').upsert(dbRow(e),{onConflict:'id'});if(error){console.error(error);alert('Could not save: '+(error.message||'Unknown Supabase error'))}}
 async function loadSharedEdits(){
  const {data,error}=await db.from('event_edits').select('*');if(error){console.error(error);alert('Could not load shared edits from Supabase.');return}
- (data||[]).forEach(r=>{if(state[r.id]) ['application','approval','fit','priority','venue','crowd','plan','notes','planned_time','from_previous_stop','map_link','why_forgone'].forEach(k=>{if(r[k]!=null)state[r.id][k]=String(r[k])})})
+ (data||[]).forEach(r=>{if(state[r.id]) ['application','approval','fit','priority','venue','crowd','plan','notes','planned_time','from_previous_stop','map_link','naver_map_link','why_forgone'].forEach(k=>{if(r[k]!=null)state[r.id][k]=String(r[k])})})
 }
 async function seedMissingEvents(){
  const {data,error}=await db.from('event_edits').select('id');if(error)return;
@@ -357,6 +357,7 @@ function render(){
   <td><select class="planned-select" data-k="planned_time">${plannedOptions(e)}</select></td>
   <td><input class="inline-text" data-k="from_previous_stop" value="${esc(e.from_previous_stop)}" placeholder="Previous stop"></td>
   <td><input class="map-input" data-k="map_link" value="${esc(e.map_link)}" placeholder="Google Maps link"></td>
+  <td><input class="map-input" data-k="naver_map_link" value="${esc(e.naver_map_link)}" placeholder="Naver Map link"></td>
   <td><input class="notes" data-k="notes" value="${esc(e.notes)}" placeholder="Notes / rationale"></td>`;
   tr.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',async()=>{e[el.dataset.k]=el.value;await saveEvent(e)}));
   tr.querySelectorAll('input[data-k]').forEach(el=>el.addEventListener('blur',async()=>{e[el.dataset.k]=el.value;await saveEvent(e)}));
