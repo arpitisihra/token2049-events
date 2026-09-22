@@ -41,7 +41,13 @@
 .timeline-time{position:absolute;left:-112px;top:19px;width:62px;text-align:right;font-size:11px;font-weight:750;color:#657069}
 .timeline-card{border:1px solid #e4e7e4;background:#f8f9f7;border-radius:14px;padding:14px 16px}
 .timeline-card a{color:#1f4f3b;text-decoration:none}.timeline-card a:hover{text-decoration:underline}
-.timeline-event{font-size:14px;font-weight:780;margin-bottom:7px}
+.timeline-event{font-size:14px;font-weight:780;margin-bottom:8px}
+.timeline-card-time{font-size:12px;font-weight:700;color:#5f6963;margin-bottom:5px}
+.timeline-venue{font-size:11px;color:#7a827d}
+.timeline-title-link{color:#1f4f3b;text-decoration:none}
+.timeline-title-link:hover{text-decoration:underline}
+.timeline-venue a{color:#5f746a;text-decoration:none}
+.timeline-venue a:hover{text-decoration:underline}
 .timeline-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;color:#777;font-size:11px}
 .timeline-meta .setting{background:#ecefec;border-radius:999px;padding:4px 7px}
 .timeline-unscheduled{margin-top:22px;padding-top:18px;border-top:1px dashed #ddd}
@@ -90,14 +96,22 @@ function timelineRender(day){
   h+='<div class="timeline">';
   for(const e of scheduled){
     const cs=String(e.crowd||'').split(',').filter(Boolean);
-    h+=`<div class="timeline-item"><div class="timeline-time">${esc(e.planned_time)}</div><div class="timeline-dot"></div><div class="timeline-card"><div class="timeline-event">${e.url?`<a href="${esc(e.url)}" target="_blank">${esc(e.event)}</a>`:esc(e.event)}</div><div class="timeline-meta"><span class="setting">${esc(e.category||'—')}</span>${cs.map(x=>`<span class="chip ${topicClass(x)}">${esc(x)}</span>`).join('')}</div></div></div>`;
+    const eventLink=String(e.url||'').trim();
+    const mapLink=String(e.map_link||'').trim();
+    const title=eventLink?`<a class="timeline-title-link" href="${esc(eventLink)}" target="_blank" rel="noopener">${esc(e.event)}</a>`:esc(e.event);
+    const venue=mapLink?`<a href="${esc(mapLink)}" target="_blank" rel="noopener">Venue ↗</a>`:'Venue';
+    h+=`<div class="timeline-item"><div class="timeline-time">${esc(e.planned_time)}</div><div class="timeline-dot"></div><div class="timeline-card"><div class="timeline-event">${title}</div><div class="timeline-card-time">${esc(e.planned_time)} SGT</div><div class="timeline-venue">${venue}</div></div></div>`;
   }
   h+='</div>';
   if(unscheduled.length){
     h+='<div class="timeline-unscheduled"><div class="timeline-unscheduled-title">Planned time not set</div>';
     for(const e of unscheduled){
       const cs=String(e.crowd||'').split(',').filter(Boolean);
-      h+=`<div class="timeline-card" style="margin-bottom:8px"><div class="timeline-event">${e.url?`<a href="${esc(e.url)}" target="_blank">${esc(e.event)}</a>`:esc(e.event)}</div><div class="timeline-meta"><span class="setting">${esc(e.category||'—')}</span>${cs.map(x=>`<span class="chip ${topicClass(x)}">${esc(x)}</span>`).join('')}</div></div>`;
+      const eventLink=String(e.url||'').trim();
+      const mapLink=String(e.map_link||'').trim();
+      const title=eventLink?`<a class="timeline-title-link" href="${esc(eventLink)}" target="_blank" rel="noopener">${esc(e.event)}</a>`:esc(e.event);
+      const venue=mapLink?`<a href="${esc(mapLink)}" target="_blank" rel="noopener">Venue ↗</a>`:'Venue';
+      h+=`<div class="timeline-card" style="margin-bottom:8px"><div class="timeline-event">${title}</div><div class="timeline-card-time">Planned time not set</div><div class="timeline-venue">${venue}</div></div>`;
     }
     h+='</div>';
   }
