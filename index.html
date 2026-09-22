@@ -245,7 +245,13 @@ th:nth-child(4) select,td:nth-child(4) select{max-width:115px}
 .tag-other{background:#eeeeee;color:#626262;border-color:#dddddd}
 
 </style>
-</head>
+<style>
+.tablebox{overflow:auto!important;max-height:none!important;height:auto!important}
+th{position:static!important;top:auto!important}
+#frozenHead{display:none;position:fixed;top:0;z-index:1000;overflow:hidden;background:#f6f8f6;border-bottom:1px solid #cfd5d0;box-shadow:0 2px 5px rgba(15,20,15,.10)}
+#frozenHead table{border-collapse:separate;border-spacing:0;margin:0}
+#frozenHead th{background:#f6f8f6!important}
+</style></head>
 <body>
 <header class="masthead">
   <div class="masthead-row">
@@ -395,5 +401,23 @@ window.addEventListener('DOMContentLoaded',async()=>{
  await loadSharedEdits();await seedMissingEvents();render();
 });
 </script>
-</body>
+<script>
+(function(){
+ const box=document.querySelector('.tablebox'),table=box&&box.querySelector('table'),head=table&&table.querySelector('thead');
+ if(!box||!table||!head)return;
+ const frozen=document.createElement('div');frozen.id='frozenHead';
+ const ct=document.createElement('table'),ch=head.cloneNode(true);ct.appendChild(ch);frozen.appendChild(ct);document.body.appendChild(frozen);
+ function sync(){
+  const rr=head.querySelectorAll('th'),cc=ch.querySelectorAll('th'),br=box.getBoundingClientRect();
+  frozen.style.left=br.left+'px';frozen.style.width=br.width+'px';ct.style.width=table.scrollWidth+'px';ct.style.minWidth=table.scrollWidth+'px';
+  rr.forEach((x,i)=>{if(cc[i]){const w=x.getBoundingClientRect().width;cc[i].style.width=w+'px';cc[i].style.minWidth=w+'px';cc[i].style.maxWidth=w+'px';cc[i].style.boxSizing='border-box'}});
+  ct.style.transform='translateX('+(-box.scrollLeft)+'px)';
+ }
+ function update(){const hr=head.getBoundingClientRect(),tr=table.getBoundingClientRect(),show=hr.top<=0&&tr.bottom>hr.height;frozen.style.display=show?'block':'none';if(show)sync()}
+ box.addEventListener('scroll',()=>{if(frozen.style.display==='block')sync()});
+ window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',()=>{update();sync()});
+ const body=document.getElementById('body');if(body)new MutationObserver(()=>{sync();update()}).observe(body,{childList:true,subtree:true});
+ sync();update();
+})();
+</script></body>
 </html>
