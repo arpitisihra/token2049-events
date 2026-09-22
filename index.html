@@ -42,7 +42,7 @@ header.masthead{
   background:var(--accent-dark);
   color:#eef6f1;
   padding:22px 28px 20px;
-  position:sticky; top:0; z-index:30;
+  position:relative;
   border-bottom:3px solid var(--accent);
 }
 .masthead-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
@@ -69,7 +69,7 @@ h1{
 .toolbar{
   background:var(--panel); border-bottom:1px solid var(--line);
   padding:12px 28px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-  position:sticky; top:96px; z-index:29;
+  position:relative;
 }
 input,select,button{
   font:inherit; font-family:var(--font-sans); font-size:12.5px;
@@ -97,11 +97,11 @@ button:not(.primary):hover{background:#f4f6f4}
 .wrap{padding:18px 28px 44px}
 .tablebox{
   background:var(--panel); border:1px solid var(--line); border-radius:10px;
-  overflow:auto; box-shadow:0 1px 3px rgba(15,20,15,.05);
+  overflow:visible; box-shadow:0 1px 3px rgba(15,20,15,.05);
 }
 table{border-collapse:separate; border-spacing:0; width:100%; min-width:1340px}
 th{
-  position:sticky; top:150px; background:#f6f8f6; text-align:left;
+  position:sticky; top:0; background:#f6f8f6; text-align:left;
   padding:9px 10px; border-bottom:1px solid var(--line-strong);
   white-space:nowrap; z-index:3; font-size:10.5px; font-weight:600;
   text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
