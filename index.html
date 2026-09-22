@@ -42,7 +42,7 @@ header.masthead{
   background:var(--accent-dark);
   color:#eef6f1;
   padding:22px 28px 20px;
-  position:relative;
+  position:static; top:0; z-index:30;
   border-bottom:3px solid var(--accent);
 }
 .masthead-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
@@ -69,7 +69,7 @@ h1{
 .toolbar{
   background:var(--panel); border-bottom:1px solid var(--line);
   padding:12px 28px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-  position:relative;
+  position:static; top:96px; z-index:29;
 }
 input,select,button{
   font:inherit; font-family:var(--font-sans); font-size:12.5px;
@@ -97,11 +97,11 @@ button:not(.primary):hover{background:#f4f6f4}
 .wrap{padding:18px 28px 44px}
 .tablebox{
   background:var(--panel); border:1px solid var(--line); border-radius:10px;
-  overflow:visible; box-shadow:0 1px 3px rgba(15,20,15,.05);
+  overflow:auto; box-shadow:0 1px 3px rgba(15,20,15,.05);
 }
 table{border-collapse:separate; border-spacing:0; width:100%; min-width:1340px}
 th{
-  position:sticky; top:0; background:#f6f8f6; text-align:left;
+  position:static; top:auto; background:#f6f8f6; text-align:left;
   padding:9px 10px; border-bottom:1px solid var(--line-strong);
   white-space:nowrap; z-index:3; font-size:10.5px; font-weight:600;
   text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft);
@@ -229,6 +229,21 @@ th:nth-child(4) select,td:nth-child(4) select{max-width:115px}
 .inline-text{min-width:150px;width:100%}
 .map-input{min-width:170px;width:100%}
 .planned-select{min-width:100px}
+
+/* Shared Topic Fit chip colours */
+.tag-defi{background:#e9e3fb;color:#5e45a1;border-color:#d7ccf5}
+.tag-infrastructure{background:#e3eff9;color:#416f94;border-color:#cbdff0}
+.tag-stablecoins{background:#e0f3ea;color:#39715a;border-color:#c5e7d6}
+.tag-payments{background:#fff0d9;color:#8a6328;border-color:#f2ddb9}
+.tag-liquidity{background:#dff1f3;color:#356f75;border-color:#c6e3e6}
+.tag-rwa-tokenization{background:#eee5f6;color:#71528c;border-color:#dfcfec}
+.tag-institutional-onchain-finance{background:#e6eef2;color:#476675;border-color:#cfdee5}
+.tag-investors-vcs-lps{background:#f7edcf;color:#866b28;border-color:#ecdca8}
+.tag-settlement{background:#e5ebfb;color:#3f5f9e;border-color:#cfdbf5}
+.tag-compliance-security{background:#f1ece4;color:#725e43;border-color:#e2d8c8}
+.tag-party{background:#fbe4eb;color:#984e67;border-color:#f3cad7}
+.tag-other{background:#eeeeee;color:#626262;border-color:#dddddd}
+
 </style>
 </head>
 <body>
@@ -291,6 +306,12 @@ const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qiEAVlt3Q2BhaarnS1w0jA_K_2aEPO9";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 
 const PEOPLE=['Pak','Matthew','Arpit'];
+function topicClass(v){const m={
+'DeFi':'tag-defi','infrastructure':'tag-infrastructure','stablecoins':'tag-stablecoins',
+'payments':'tag-payments','liquidity':'tag-liquidity','RWA / tokenization':'tag-rwa-tokenization',
+'institutional onchain finance':'tag-institutional-onchain-finance','investors / VCs / LPs':'tag-investors-vcs-lps',
+'settlement':'tag-settlement','compliance / security':'tag-compliance-security','Party':'tag-party'
+};return m[String(v||'').trim()]||'tag-other'}
 const TOPIC_TAGS=['DeFi','infrastructure','stablecoins','payments','liquidity','RWA / tokenization','institutional onchain finance','investors / VCs / LPs','settlement','compliance / security','Party'];
 const FORGONE_REASONS=['conflict','geography','lower relevance','weaker crowd','weaker format','airport timing','a stronger overlapping event'];
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
